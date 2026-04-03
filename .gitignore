@@ -1,0 +1,84 @@
+# ======================
+# Project files
+# ======================
+HELP.md
+
+# ======================
+# Maven
+# ======================
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
+
+# ======================
+# Logs
+# ======================
+*.log
+
+# ======================
+# Compiled files
+# ======================
+*.class
+
+# ======================
+# Package files
+# ======================
+*.jar
+*.war
+
+# ======================
+# IDE - IntelliJ
+# ======================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ======================
+# IDE - VS Code
+# ======================
+.vscode/
+
+# ======================
+# IDE - STS (Spring Tool Suite)
+# ======================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ======================
+# IDE - NetBeans
+# ======================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Environment & Sensitive Config
+# ======================
+application.properties
+application.yml
+application-dev.properties
+application-prod.properties
+.env
+
+# ======================
+# Node (nếu có frontend)
+# ======================
+node_modules/
