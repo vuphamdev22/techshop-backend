@@ -23,6 +23,7 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.30</lombok.version>
 		<jjwt.version>0.12.3</jjwt.version>
+		<spring-boot.version>3.3.5</spring-boot.version>
 	</properties>
 
 	<dependencies>
@@ -136,6 +137,10 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<encoding>UTF-8</encoding>
+					<compilerArgs>
+						<arg>-XDignore.symbol.file</arg>
+					</compilerArgs>
 
 					<annotationProcessorPaths>
 
@@ -162,6 +167,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
 			</plugin>
 
 		</plugins>

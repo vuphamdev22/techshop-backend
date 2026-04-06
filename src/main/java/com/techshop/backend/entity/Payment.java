@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,7 +35,7 @@ public class Payment {
     private String transactionId;
 
     // 💵 số tiền
-    private BigDecimal amount;
+    private Double amount;
 
     // ⏱ thời gian tạo
     private LocalDateTime createdAt;

@@ -4,65 +4,82 @@ import com.techshop.backend.dto.request.PaymentCreateRequest;
 import com.techshop.backend.dto.response.PaymentResponse;
 import com.techshop.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    /**
-     * Tạo payment và trả về URL VNPAY
-     */
-    @PostMapping("/orders/{orderId}")
+    @PostMapping("/create")
     public ResponseEntity<PaymentResponse> createPayment(
-            @PathVariable Long orderId,
-            @Valid @RequestBody PaymentCreateRequest request,
-            HttpServletRequest httpRequest) {
+            @RequestParam Long orderId,
+            @Valid @RequestBody PaymentCreateRequest request) {
 
-        // Lấy IP thật của user
-        String ipAddress = httpRequest.getRemoteAddr();
-
-        PaymentResponse response = paymentService.createPayment(orderId, request, ipAddress);
+        PaymentResponse response = paymentService.createPayment(orderId, request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * VNPAY redirect về sau khi thanh toán
-     */
-    @GetMapping("/vnpay-return")
-    public void vnpayReturn(@RequestParam Map<String, String> params, HttpServletResponse response) throws IOException {
+    @GetMapping("/callback")
+    public ResponseEntity<String> handleCallback(
+            @RequestParam String transactionId,
+            @RequestParam boolean success,
+            @RequestParam(required = false) String note) {
 
-        boolean isSuccess = paymentService.handleVnpayReturn(params);
-
-        String orderId = paymentService.getOrderIdFromTxnRef(params);
-
-        String redirectUrl;
-
-        if (isSuccess) {
-            redirectUrl = "http://localhost:5173/order-success?orderId=" + orderId + "&status=paid";
-        } else {
-            redirectUrl = "http://localhost:5173/order-failed?orderId=" + orderId + "&status=failed";
-        }
-
-        response.sendRedirect(redirectUrl);
+        paymentService.handlePaymentCallback(transactionId, success, note);
+        return ResponseEntity.ok("Callback processed");
     }
-    /**
-     * Lấy payment theo order
-     */
-    @GetMapping("/orders/{orderId}")
-    public ResponseEntity<PaymentResponse> getPaymentByOrderId(@PathVariable Long orderId) {
 
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<PaymentResponse> getPaymentByOrderId(@PathVariable Long orderId) {
         PaymentResponse response = paymentService.getPaymentByOrderId(orderId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/vnpay-return")
+    public ResponseEntity<String> handleVnPayReturn(HttpServletRequest request) {
+        try {
+            // Lấy các tham số từ VNPay
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            Map<String, String> vnpParams = new HashMap<>();
+
+            for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+                vnpParams.put(entry.getKey(), entry.getValue()[0]);
+            }
+
+            // Xử lý callback từ VNPay
+            paymentService.handleVnPayCallback(vnpParams);
+
+            String transactionId = vnpParams.get("vnp_TxnRef");
+            String responseCode = vnpParams.get("vnp_ResponseCode");
+            boolean success = "00".equals(responseCode);
+
+            log.info("VNPay return processed - Transaction: {}, Success: {}", transactionId, success);
+
+            // Redirect về frontend với kết quả
+            String redirectUrl = "http://localhost:5173/payment-result?success=" + success +
+                               "&transactionId=" + transactionId +
+                               "&responseCode=" + responseCode;
+
+            return ResponseEntity.status(302)
+                    .header("Location", redirectUrl)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Error handling VNPay return", e);
+            return ResponseEntity.status(302)
+                    .header("Location", "http://localhost:5173/payment-result?success=false&error=processing_error")
+                    .build();
+        }
     }
 }

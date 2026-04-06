@@ -1,18 +1,18 @@
 package com.techshop.backend.service.Impl;
 
 import com.techshop.backend.dto.request.CheckoutRequest;
-import com.techshop.backend.dto.request.PaymentCreateRequest;
 import com.techshop.backend.dto.response.OrderResponse;
 import com.techshop.backend.entity.*;
 import com.techshop.backend.enums.OrderStatus;
-import com.techshop.backend.enums.PaymentMethod;
 import com.techshop.backend.exception.AppException;
 import com.techshop.backend.exception.ErrorCode;
+import com.techshop.backend.dto.request.PaymentCreateRequest;
+import com.techshop.backend.enums.PaymentMethod;
 import com.techshop.backend.mapper.OrderMapper;
 import com.techshop.backend.repository.CartRepository;
 import com.techshop.backend.repository.OrderRepository;
-import com.techshop.backend.service.OrderService;
 import com.techshop.backend.service.PaymentService;
+import com.techshop.backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +30,10 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentService paymentService;
 
     @Override
-    @Transactional
+    @Transactional // 🔥 rất quan trọng (rollback nếu lỗi)
     public OrderResponse checkout(Long userId, CheckoutRequest request, String ipAddress) {
 
-        // 🔥 1. Validate payment method
-        if (request.getPaymentMethod() == null) {
-            throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
-        }
-
-        // 🔥 2. Lấy cart
+        // 🔥 1. lấy cart
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
 
@@ -46,15 +41,17 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.CART_EMPTY);
         }
 
-        // 🔥 3. Tạo order
+        // 🔥 2. tạo order
         Order order = new Order();
         order.setUser(cart.getUser());
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
+
+        // 🔥 PAYMENT DEFAULT (không phá logic cũ)
         order.setPaymentMethod(request.getPaymentMethod());
         order.setIsPaid(false);
 
-        // 🔥 4. Shipping
+        // 🔥 3. mapping shipping
         ShippingAddress shipping = new ShippingAddress();
         shipping.setFirstName(request.getFirstName());
         shipping.setLastName(request.getLastName());
@@ -67,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setShippingAddress(shipping);
 
-        // 🔥 5. Order Items
+        // 🔥 4. mapping order items
         List<OrderItem> orderItems = new ArrayList<>();
         double total = 0;
 
@@ -87,36 +84,30 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(orderItems);
         order.setTotalPrice(total);
 
-        // 🔥 6. Save order
+        // 🔥 5. save order
         orderRepository.save(order);
 
-        // 🔥 7. Clear cart
+        // 🔥 6. clear cart
         cart.getItems().clear();
         cartRepository.save(cart);
 
-        // 🔥 8. Handle payment
+        // 🔥 7. Handle payment
         String paymentUrl = null;
-
         if (request.getPaymentMethod() != PaymentMethod.COD) {
-
+            // Online payment: create payment and get URL
             PaymentCreateRequest paymentRequest = new PaymentCreateRequest();
             paymentRequest.setMethod(request.getPaymentMethod());
-
-            var paymentResponse = paymentService.createPayment(
-                    order.getId(),
-                    paymentRequest,
-                    ipAddress
-            );
-
+            var paymentResponse = paymentService.createPayment(order.getId(), paymentRequest);
             paymentUrl = paymentResponse.getPaymentUrl();
         }
 
-        // 🔥 9. Return response
+        // 🔥 8. return
         return OrderMapper.toResponseWithPaymentUrl(order, paymentUrl);
     }
 
     @Override
     public List<OrderResponse> getMyOrders(Long userId) {
+
         return orderRepository.findByUserId(userId)
                 .stream()
                 .map(OrderMapper::toResponse)
@@ -138,6 +129,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getAllOrders() {
+
         return orderRepository.findAll()
                 .stream()
                 .map(OrderMapper::toResponse)
@@ -153,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus newStatus;
 
         try {
-            newStatus = OrderStatus.valueOf(status.toUpperCase());
+            newStatus = OrderStatus.valueOf(status.toUpperCase()); // 🔥 fix input
         } catch (Exception e) {
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
@@ -167,17 +159,17 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.toResponse(order);
     }
 
-    @Override
-    @Transactional
+    @Override    @Transactional
     public OrderResponse markOrderAsPaid(Long orderId) {
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
+        // Chỉ cho COD orders
         if (order.getPaymentMethod() != PaymentMethod.COD) {
             throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
         }
 
+        // Chỉ nếu chưa paid
         if (order.getIsPaid()) {
             throw new AppException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
@@ -185,11 +177,11 @@ public class OrderServiceImpl implements OrderService {
         order.setIsPaid(true);
         order.setStatus(OrderStatus.CONFIRMED);
 
-        return OrderMapper.toResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        return OrderMapper.toResponse(savedOrder);
     }
 
-    @Override
-    public OrderResponse getOrderDetailForAdmin(Long orderId) {
+    @Override    public OrderResponse getOrderDetailForAdmin(Long orderId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
@@ -197,16 +189,20 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.toResponse(order);
     }
 
+    // 🔥 validate flow (chuẩn business)
     private void validateStatusTransition(OrderStatus current, OrderStatus next) {
 
+        // ❌ trạng thái cuối không update
         if (current == OrderStatus.CANCELLED || current == OrderStatus.DELIVERED) {
             throw new AppException(ErrorCode.CANNOT_UPDATE_FINAL_STATUS);
         }
 
+        // ❌ phải confirm trước khi ship
         if (current == OrderStatus.PENDING && next == OrderStatus.SHIPPED) {
             throw new AppException(ErrorCode.MUST_CONFIRM_BEFORE_SHIPPING);
         }
 
+        // ❌ không quay ngược trạng thái
         if (current == OrderStatus.CONFIRMED && next == OrderStatus.PENDING) {
             throw new AppException(ErrorCode.INVALID_STATUS_TRANSITION);
         }

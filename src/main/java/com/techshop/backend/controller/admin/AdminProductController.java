@@ -9,6 +9,8 @@ import com.techshop.backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
@@ -27,6 +29,18 @@ public class AdminProductController {
     public ProductResponse  updateProduct(@PathVariable Long id,
                                  @RequestBody ProductUpdateRequest product){
         return productService.updateProduct(id, product);
+    }
+
+    // list sản phẩm
+    @GetMapping
+    public List<ProductResponse> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    // chi tiết sản phẩm
+    @GetMapping("/{id}")
+    public ProductResponse getProductById(@PathVariable Long id) {
+        return productService.getProductById(id);
     }
 
     // xóa sản phẩm

@@ -69,6 +69,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         category.setName(request.getName());
         category.setDescription(request.getDescription());
+        category.setIcon(request.getIcon());
+        category.setStatus(request.getStatus());
 
         return mapper.toResponse(repository.save(category));
     }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -25,16 +26,19 @@ public class Product {
     private String description;
 
     private Double price;
-
     private Double originalPrice;
-
     private Integer stock;
-
     private Double rating;
-
     private Integer reviews;
-
     private String badge;
+    @Column(name = "sku", unique = true)
+    private String sku;
+    @Column(name = "min_stock")
+    private Integer minStock;
+    @Column(name = "max_stock")
+    private Integer maxStock;
+    @Column(name = "last_restocked")
+    private LocalDate lastRestocked;
 
     // 🔗 Category
     @ManyToOne
@@ -54,6 +58,9 @@ public class Product {
 
     @PrePersist
     public void prePersist() {
+        if (this.lastRestocked == null && this.stock != null && this.stock > 0) {
+            this.lastRestocked = LocalDate.now();
+        }
         createdAt = LocalDateTime.now();
     }
 }

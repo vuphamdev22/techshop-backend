@@ -28,6 +28,14 @@ public class ProductUpdateRequest {
 
     private String badge;
 
+    private String sku;
+
+    @Min(0)
+    private Integer minStock;
+
+    @Min(0)
+    private Integer maxStock;
+
     private List<String> images; // optional
 
     private Map<String, String> specs;

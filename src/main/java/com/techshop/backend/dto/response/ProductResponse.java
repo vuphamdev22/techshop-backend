@@ -2,8 +2,7 @@ package com.techshop.backend.dto.response;
 
 import lombok.Data;
 
-import java.util.List;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +17,13 @@ public class ProductResponse {
 
     private Double price;
     private Double originalPrice;
+
+    private Integer stock;
+
+    private String sku;
+    private Integer minStock;
+    private Integer maxStock;
+    private LocalDate lastRestocked;
 
     private Double rating;
     private Integer reviews;

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
+
+    private static final int DEFAULT_MIN_STOCK = 10;
+    private static final int DEFAULT_MAX_STOCK = 100;
 
     @Override
     public ProductResponse createProduct(ProductRequest request){
@@ -40,9 +44,19 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setOriginalPrice(request.getOriginalPrice());
+        Integer previousStock = product.getStock();
         product.setStock(request.getStock());
         product.setBadge(request.getBadge());
+        product.setSku(request.getSku());
+        applyInventoryDefaults(product, request.getMinStock(), request.getMaxStock());
+        refreshLastRestocked(product, previousStock, request.getStock());
+        product.setSku(request.getSku());
         product.setCategory(category);
+        product.setStock(request.getStock());
+        applyInventoryDefaults(product, request.getMinStock(), request.getMaxStock());
+        if (product.getStock() != null && product.getStock() > 0) {
+            product.setLastRestocked(LocalDate.now());
+        }
 
         // =========================
         // 🔹 3. IMAGES
@@ -180,5 +194,41 @@ public class ProductServiceImpl implements ProductService {
                         .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         productRepository.deleteById(id);
+    }
+
+    private void applyInventoryDefaults(Product product, Integer minStock, Integer maxStock) {
+        int resolvedMin = resolveMinStock(minStock, product.getMinStock());
+        int resolvedMax = resolveMaxStock(maxStock, product.getMaxStock(), resolvedMin, product.getStock());
+        product.setMinStock(resolvedMin);
+        product.setMaxStock(resolvedMax);
+    }
+
+    private int resolveMinStock(Integer requested, Integer existing) {
+        if (requested != null) {
+            return Math.max(0, requested);
+        }
+        if (existing != null) {
+            return Math.max(0, existing);
+        }
+        return DEFAULT_MIN_STOCK;
+    }
+
+    private int resolveMaxStock(Integer requested, Integer existing, int minStock, Integer currentStock) {
+        if (requested != null) {
+            return Math.max(minStock, requested);
+        }
+        if (existing != null) {
+            return Math.max(minStock, existing);
+        }
+        int stockValue = currentStock != null ? currentStock : minStock;
+        return Math.max(Math.max(minStock, stockValue), DEFAULT_MAX_STOCK);
+    }
+
+    private void refreshLastRestocked(Product product, Integer previousStock, Integer newStock) {
+        int oldValue = previousStock != null ? previousStock : 0;
+        int updated = newStock != null ? newStock : oldValue;
+        if (updated > oldValue) {
+            product.setLastRestocked(LocalDate.now());
+        }
     }
 }

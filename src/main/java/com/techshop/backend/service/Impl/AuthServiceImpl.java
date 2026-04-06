@@ -42,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .enabled(true)
                 .build();
 
         userRepository.save(user);
@@ -55,6 +56,10 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        if (!user.isEnabled()) {
+            throw new AppException(ErrorCode.USER_DISABLED);
         }
 
         // 🔥 FIX: thêm userId

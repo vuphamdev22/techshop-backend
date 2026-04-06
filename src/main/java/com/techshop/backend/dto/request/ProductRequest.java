@@ -21,6 +21,12 @@ public class ProductRequest {
 
     private String badge;
 
+    private String sku;
+
+    private Integer minStock;
+
+    private Integer maxStock;
+
     private List<String> images; // list url
 
     private Map<String, String> specs;
@@ -80,6 +86,30 @@ public class ProductRequest {
 
     public void setBadge(String badge) {
         this.badge = badge;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public Integer getMinStock() {
+        return minStock;
+    }
+
+    public void setMinStock(Integer minStock) {
+        this.minStock = minStock;
+    }
+
+    public Integer getMaxStock() {
+        return maxStock;
+    }
+
+    public void setMaxStock(Integer maxStock) {
+        this.maxStock = maxStock;
     }
 
     public List<String> getImages() {

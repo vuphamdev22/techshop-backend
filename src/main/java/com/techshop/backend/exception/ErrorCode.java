@@ -25,12 +25,11 @@ public enum ErrorCode {
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Payment not found"),
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "Payment already exists for this order"),
     INVALID_PAYMENT_METHOD(HttpStatus.BAD_REQUEST, "Invalid payment method for online payment"),
-    INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "Invalid signature"),
-    INVALID_PAYMENT_STATE(HttpStatus.BAD_REQUEST, "Invalid payment state"),
-    INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "Invalid order state"),
-    OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "Out of stock"),
-    INVALID_TRANSACTION(HttpStatus.BAD_REQUEST, "Invalid transaction"),
-    INVALID_STATUS(HttpStatus.BAD_REQUEST, "Invalid status");
+    INVALID_STATUS(HttpStatus.BAD_REQUEST, "Invalid status"),
+    INVALID_STOCK_VALUE(HttpStatus.BAD_REQUEST, "Stock must be zero or greater"),
+    USER_DISABLED(HttpStatus.FORBIDDEN, "User account is disabled"),
+    PAYMENT_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create payment"),
+    PAYMENT_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process payment");
 
     private final HttpStatus status;
     private final String message;

@@ -11,12 +11,12 @@ public interface PaymentService {
     /**
      * Tạo payment cho order (online payment)
      */
-    PaymentResponse createPayment(Long orderId, PaymentCreateRequest request, String ipAddress);
+    PaymentResponse createPayment(Long orderId, PaymentCreateRequest request);
 
     /**
-     * Xử lý return từ VNPAY (REAL PAYMENT)
+     * Xử lý callback từ cổng thanh toán
      */
-    boolean handleVnpayReturn(Map<String, String> params);
+    void handlePaymentCallback(String transactionId, boolean success, String note);
 
     /**
      * Lấy payment theo orderId
@@ -29,11 +29,12 @@ public interface PaymentService {
     PaymentResponse updatePaymentStatus(Long paymentId, String status);
 
     /**
-     * Tạo URL thanh toán VNPAY
+     * Tạo mock payment URL (cho development)
      */
-    String generateVnPayUrl(Payment payment, String ipAddress);
+    String generateMockPaymentUrl(Payment payment);
+
     /**
-     * Lấy orderId từ txnRef
+     * Xử lý callback từ VNPay với validation
      */
-    String getOrderIdFromTxnRef(Map<String, String> params);
+    void handleVnPayCallback(Map<String, String> vnpParams);
 }

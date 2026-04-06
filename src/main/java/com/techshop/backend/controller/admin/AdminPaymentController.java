@@ -1,7 +1,6 @@
 package com.techshop.backend.controller.admin;
 
 import com.techshop.backend.dto.response.PaymentResponse;
-import com.techshop.backend.enums.PaymentStatus;
 import com.techshop.backend.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +13,12 @@ public class AdminPaymentController {
 
     private final PaymentService paymentService;
 
-    /**
-     * Admin cập nhật trạng thái payment
-     */
     @PutMapping("/{paymentId}/status")
     public ResponseEntity<PaymentResponse> updatePaymentStatus(
             @PathVariable Long paymentId,
-            @RequestParam PaymentStatus status) {
+            @RequestParam String status) {
 
-        PaymentResponse response = paymentService.updatePaymentStatus(paymentId, status.name());
+        PaymentResponse response = paymentService.updatePaymentStatus(paymentId, status);
         return ResponseEntity.ok(response);
     }
 }
