@@ -1,4 +1,4 @@
-package com.techshop.backend.service.impl;
+package com.techshop.backend.service.Impl;
 
 import com.techshop.backend.dto.request.InventoryStockRequest;
 import com.techshop.backend.dto.response.admin.InventoryResponse;
