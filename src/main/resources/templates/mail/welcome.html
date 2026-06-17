@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chào mừng bạn!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@700;800&display=swap');
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif;">
+    <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); padding: 40px 20px; text-align: center; color: #ffffff;">
+            <h1 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -1px;">⚡ VOLTTECH</h1>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.8; letter-spacing: 2px; text-transform: uppercase;">Mua Sắm Công Nghệ Tương Lai</p>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 40px 32px;">
+            <h2 style="margin: 0 0 20px 0; color: #0f172a; font-size: 24px; font-weight: 700;">Xin chào, <span th:text="${username}">Khách hàng</span>! 👋</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                Cảm ơn bạn đã gia nhập gia đình **VoltTech** - Hệ thống bán lẻ sản phẩm công nghệ cao cấp chính hãng hàng đầu Việt Nam.
+            </p>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
+                Chúng tôi xin gửi tặng bạn một món quà chào mừng đặc biệt dưới đây để trải nghiệm đơn hàng đầu tiên thuận lợi nhất!
+            </p>
+
+            <!-- Voucher Box -->
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px dashed #3b82f6; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 32px;" th:if="${voucherCode != null}">
+                <span style="font-size: 12px; text-transform: uppercase; font-weight: 800; color: #2563eb; letter-spacing: 1.5px;">Quà tặng đặc biệt của bạn</span>
+                <h3 style="margin: 8px 0; color: #1e3a8a; font-size: 22px; font-weight: 800;">Giảm giá cho đơn hàng đầu tiên</h3>
+                <div style="background: #ffffff; border: 1px solid #bfdbfe; display: inline-block; padding: 12px 24px; border-radius: 12px; font-family: monospace; font-size: 20px; font-weight: 800; color: #1d4ed8; margin: 12px 0; letter-spacing: 1px;" th:text="${voucherCode}">WELCOME10</div>
+                <p style="margin: 0; font-size: 13px; color: #1e40af;" th:if="${expiredDate != null}">
+                    *Hạn sử dụng đến ngày: <strong th:text="${#temporals.format(expiredDate, 'dd/MM/yyyy')}">31/12/2026</strong>
+                </p>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; margin-bottom: 32px;">
+                <a href="http://localhost:5173" style="background-color: #2563eb; color: #ffffff; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25); transition: all 0.2s;">Khám Phá Cửa Hàng Ngay 🚀</a>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid #f1f5f9; margin-bottom: 32px;" />
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">
+                Bạn nhận được email này vì đã đăng ký tài khoản tại hệ thống của chúng tôi. Nếu có bất kỳ câu hỏi nào, xin vui lòng trả lời email này để được đội ngũ CSKH hỗ trợ 24/7.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px; text-align: center; color: #94a3b8; font-size: 12px;">
+            <p style="margin: 0 0 4px 0;">© 2026 VoltTech Inc. All rights reserved.</p>
+            <p style="margin: 0;">Hotline: 1900 xxxx · Email: cskh@volttech.com.vn</p>
+        </div>
+    </div>
+</body>
+</html>

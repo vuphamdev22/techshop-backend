@@ -40,9 +40,10 @@ public class Order {
 
     // 🔥 PAYMENT (NEW - không ảnh hưởng logic cũ)
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;   // COD, VNPAY, MOMO
+    private PaymentMethod paymentMethod;   // COD, VNPAY, MOMO, BANK
     private Boolean isPaid;         // true/false
     private String paymentTxnId;    // mã giao dịch bên cổng thanh toán
+    private String qrCodeUrl;       // URL QR code thanh toán (dùng cho BANK payment)
 
     // 🔗 ITEMS
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

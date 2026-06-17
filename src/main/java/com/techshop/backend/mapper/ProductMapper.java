@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public interface ProductMapper {
 
     @Mapping(source = "category.name", target = "category")
+    @Mapping(source = "brand.name", target = "brand")
 
     // ảnh chính
     @Mapping(target = "image", expression = "java(getFirstImage(product))")

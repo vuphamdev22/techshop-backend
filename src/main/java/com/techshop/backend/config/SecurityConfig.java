@@ -38,19 +38,38 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // 🔓 PUBLIC
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/public/track/**").permitAll()
                         .requestMatchers("/api/payment/vnpay-return").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/refresh").permitAll()
 
+                        // 🔓 public categories
+                        .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+
+                        // 🔓 public chatbot & websockets
+                        .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/ws-chat/**").permitAll()
+
                         // 🔓 public product
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+
+                        // 🔓 public coupons
+                        .requestMatchers(HttpMethod.GET, "/api/coupons").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/coupons/**").permitAll()
 
                         // ✅ CART (phải login)
                         .requestMatchers("/api/cart/**").authenticated()
 
-                        // ✅ CART (phải login)
+                        // ✅ ORDERS (phải login)
                         .requestMatchers("/api/orders/**").authenticated()
+
+                        // ✅ MEMBERSHIP (user endpoints require login, admin requires ADMIN role)
+                        .requestMatchers("/api/membership/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/membership/**").authenticated()
 
                         // 🔒 ADMIN
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
@@ -76,7 +95,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

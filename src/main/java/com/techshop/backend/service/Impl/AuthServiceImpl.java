@@ -3,6 +3,7 @@ package com.techshop.backend.service.Impl;
 import com.techshop.backend.dto.request.LoginRequest;
 import com.techshop.backend.dto.request.RegisterRequest;
 import com.techshop.backend.dto.response.JwtResponse;
+import com.techshop.backend.dto.response.UserDTO;
 import com.techshop.backend.entity.User;
 import com.techshop.backend.enums.Role;
 import com.techshop.backend.exception.AppException;
@@ -11,6 +12,8 @@ import com.techshop.backend.repository.RefreshTokenRepository;
 import com.techshop.backend.repository.UserRepository;
 import com.techshop.backend.security.JwtTokenProvider;
 import com.techshop.backend.service.AuthService;
+import com.techshop.backend.service.EmailService;
+import com.techshop.backend.service.MembershipService;
 import com.techshop.backend.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final EmailService emailService;
+    private final MembershipService membershipService;
 
     @Override
     public void register(RegisterRequest request) {
@@ -35,9 +40,14 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
+        String lName = request.getLastName();
+        if (lName == null || lName.trim().isEmpty()) {
+            lName = ".";
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .lastName(lName)
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -46,6 +56,16 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+
+        // Gửi email chào mừng bất đồng bộ (không gây chậm luồng đăng ký)
+        String fullNameGreeting = user.getFirstName();
+        if (user.getLastName() != null && !user.getLastName().equals(".")) {
+            fullNameGreeting += " " + user.getLastName();
+        }
+        emailService.sendWelcomeEmail(user.getEmail(), fullNameGreeting);
+
+        // Phát voucher chào mừng Bronze 5%
+        membershipService.issueWelcomeVoucher(user.getId());
     }
 
     @Override
@@ -81,6 +101,14 @@ public class AuthServiceImpl implements AuthService {
                 7 * 24 * 60 * 60 * 1000
         );
 
-        return new JwtResponse(accessToken, refreshToken);
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getFirstName() + " " + user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole().name()
+        );
+
+        return new JwtResponse(accessToken, refreshToken, userDTO);
     }
 }

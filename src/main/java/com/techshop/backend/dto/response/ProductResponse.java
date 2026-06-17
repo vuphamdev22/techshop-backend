@@ -34,6 +34,8 @@ public class ProductResponse {
 
     private String badge;
 
+    private String brand;
+
     private String description;
 
     private Map<String, String> specs;

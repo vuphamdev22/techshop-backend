@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chúc mừng sinh nhật bạn!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@800&display=swap');
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fff1f2; font-family: 'Inter', sans-serif;">
+    <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; border: 1px solid #ffe4e6; box-shadow: 0 10px 30px rgba(244, 63, 94, 0.05);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); padding: 50px 20px; text-align: center; color: #ffffff;">
+            <div style="font-size: 50px; margin-bottom: 10px;">🎂</div>
+            <h1 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 800;">HAPPY BIRTHDAY!</h1>
+            <p style="margin: 8px 0 0 0; font-size: 15px; opacity: 0.9; font-weight: 600; letter-spacing: 1px;">Chúc Bạn Một Tuổi Mới Ngập Tràn Niềm Vui & Thành Công</p>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 40px 32px;">
+            <h2 style="margin: 0 0 16px 0; color: #881337; font-size: 22px; font-weight: 700;">Chào bạn, <span th:text="${username}">Khách hàng</span>! 🥳</h2>
+            <p style="color: #4f4f4f; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+                Hôm nay là một ngày vô cùng đặc biệt! Đội ngũ **VoltTech** xin gửi tới bạn lời chúc mừng sinh nhật chân thành nhất. Chúc bạn tuổi mới nhiều sức khỏe, hạnh phúc và gặt hái được nhiều thành công hơn nữa trong cuộc sống.
+            </p>
+            <p style="color: #4f4f4f; font-size: 15px; line-height: 1.6; margin: 0 0 32px 0;">
+                Để ngày sinh nhật thêm trọn vẹn, VoltTech xin gửi tặng bạn một món quà nho nhỏ dưới đây. Hy vọng món quà này sẽ giúp bạn có những giây phút mua sắm thật vui vẻ!
+            </p>
+
+            <!-- Gift Card -->
+            <div style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 2px dashed #f43f5e; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 32px;">
+                <span style="font-size: 12px; text-transform: uppercase; font-weight: 800; color: #e11d48; letter-spacing: 1.5px;">Quà tặng sinh nhật độc quyền</span>
+                <h3 style="margin: 8px 0; color: #9f1239; font-size: 20px; font-weight: 800;">Giảm giá 15% tất cả sản phẩm</h3>
+                <div style="background: #ffffff; border: 1px solid #fda4af; display: inline-block; padding: 12px 24px; border-radius: 12px; font-family: monospace; font-size: 20px; font-weight: 800; color: #be123c; margin: 12px 0; letter-spacing: 1px;">HPBD15</div>
+                <p style="margin: 0; font-size: 12px; color: #b91c1c;">*Hạn sử dụng: 14 ngày kể từ hôm nay.</p>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; margin-bottom: 32px;">
+                <a href="http://localhost:5173" style="background-color: #f43f5e; color: #ffffff; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); transition: all 0.2s;">Nhận Quà Sinh Nhật 🎁</a>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #ffe4e6; margin-bottom: 32px;" />
+            <p style="color: #9f1239; font-size: 13px; line-height: 1.5; margin: 0; text-align: center; opacity: 0.8;">
+                Thân ái,<br /><strong>Đội ngũ VoltTech</strong>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #fff1f2; border-top: 1px solid #ffe4e6; padding: 24px; text-align: center; color: #fda4af; font-size: 12px;">
+            <p style="margin: 0 0 4px 0; color: #e11d48;">© 2026 VoltTech Inc. All rights reserved.</p>
+            <p style="margin: 0; color: #fda4af;">Hotline: 1900 xxxx · Email: cskh@volttech.com.vn</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -12,8 +12,11 @@ import com.techshop.backend.mapper.OrderMapper;
 import com.techshop.backend.repository.CartRepository;
 import com.techshop.backend.repository.OrderRepository;
 import com.techshop.backend.service.PaymentService;
+import com.techshop.backend.service.PaymentGatewayService;
 import com.techshop.backend.service.OrderService;
+import com.techshop.backend.service.MembershipService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +26,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final PaymentService paymentService;
+    private final PaymentGatewayService paymentGatewayService;
+    private final MembershipService membershipService;
 
     @Override
     @Transactional // 🔥 rất quan trọng (rollback nếu lỗi)
@@ -93,7 +99,15 @@ public class OrderServiceImpl implements OrderService {
 
         // 🔥 7. Handle payment
         String paymentUrl = null;
-        if (request.getPaymentMethod() != PaymentMethod.COD) {
+        if (request.getPaymentMethod() == PaymentMethod.VIETQR) {
+            // Generate QR code cho ngân hàng
+            String qrUrl = paymentGatewayService.generateQRCode(order.getId(), total);
+            if (qrUrl != null) {
+                order.setQrCodeUrl(qrUrl);
+                orderRepository.save(order);
+                paymentUrl = qrUrl;
+            }
+        } else if (request.getPaymentMethod() != PaymentMethod.COD) {
             // Online payment: create payment and get URL
             PaymentCreateRequest paymentRequest = new PaymentCreateRequest();
             paymentRequest.setMethod(request.getPaymentMethod());
@@ -153,8 +167,17 @@ public class OrderServiceImpl implements OrderService {
         validateStatusTransition(order.getStatus(), newStatus);
 
         order.setStatus(newStatus);
-
         orderRepository.save(order);
+
+        // 🏆 Membership: process points when DELIVERED
+        if (newStatus == OrderStatus.DELIVERED && order.getUser() != null) {
+            try {
+                membershipService.processOrderCompletion(order.getUser().getId(), order.getTotalPrice());
+            } catch (Exception e) {
+                // Non-critical: don't fail order update if membership fails
+                log.warn("Failed to process membership for order {}: {}", orderId, e.getMessage());
+            }
+        }
 
         return OrderMapper.toResponse(order);
     }
@@ -164,10 +187,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
-        // Chỉ cho COD orders
-        if (order.getPaymentMethod() != PaymentMethod.COD) {
-            throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
-        }
+
 
         // Chỉ nếu chưa paid
         if (order.getIsPaid()) {

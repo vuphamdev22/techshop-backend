@@ -39,6 +39,11 @@ public class UserController {
         user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
+        user.setBirthday(request.getBirthday());
+        user.setGender(request.getGender());
+        if (request.getEmailSubscribed() != null) {
+            user.setEmailSubscribed(request.getEmailSubscribed());
+        }
 
         return userRepository.save(user);
     }

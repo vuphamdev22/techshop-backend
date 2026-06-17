@@ -44,6 +44,9 @@ public class OrderMapper {
 
         // 🔥 items
         res.setItems(mapItems(order.getItems()));
+        
+        // 🔥 QR code URL cho thanh toán ngân hàng
+        res.setQrCodeUrl(order.getQrCodeUrl());
 
         return res;
     }

@@ -22,4 +22,7 @@ public class OrderResponse {
 
     // 🔥 thêm paymentUrl (chỉ khi checkout online)
     private String paymentUrl;
+    
+    // 🔥 QR code URL cho thanh toán ngân hàng
+    private String qrCodeUrl;
 }

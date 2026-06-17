@@ -31,6 +31,9 @@ public class Product {
     private Double rating;
     private Integer reviews;
     private String badge;
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
     @Column(name = "sku", unique = true)
     private String sku;
     @Column(name = "min_stock")

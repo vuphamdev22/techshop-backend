@@ -27,22 +27,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
+        System.out.println(" [JWT DEBUG] Request URI: " + request.getRequestURI() + " | Method: " + request.getMethod());
+        System.out.println(" [JWT DEBUG] Auth Header: " + header);
 
         if (header != null && header.startsWith("Bearer ")) {
-
             String token = header.substring(7);
+            boolean isValid = jwtTokenProvider.validateToken(token);
+            System.out.println(" [JWT DEBUG] Token Valid: " + isValid);
 
-            if (jwtTokenProvider.validateToken(token)) {
-
+            if (isValid) {
                 String email = jwtTokenProvider.getEmailFromToken(token);
+                System.out.println(" [JWT DEBUG] Token Email: " + email);
 
                 // 🔥 LẤY ROLE TỪ TOKEN (KHÔNG QUERY DB)
                 List<String> roles = jwtTokenProvider.getRolesFromToken(token);
+                System.out.println(" [JWT DEBUG] Token Roles: " + roles);
 
                 List<SimpleGrantedAuthority> authorities =
                         roles.stream()
                                 .map(SimpleGrantedAuthority::new)
                                 .collect(Collectors.toList());
+                System.out.println(" [JWT DEBUG] Granted Authorities: " + authorities);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(

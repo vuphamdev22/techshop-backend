@@ -67,17 +67,30 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = repository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
-        category.setIcon(request.getIcon());
-        category.setStatus(request.getStatus());
+        if (request.getName() != null) {
+            category.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            category.setDescription(request.getDescription());
+        }
+        if (request.getIcon() != null) {
+            category.setIcon(request.getIcon());
+        }
+        if (request.getStatus() != null) {
+            category.setStatus(request.getStatus());
+        }
 
         return mapper.toResponse(repository.save(category));
     }
 
     @Override
     public void delete(Long id) {
-
+        if (!repository.existsById(id)) {
+            throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+        if (productRepository.countByCategoryId(id) > 0) {
+            throw new AppException(ErrorCode.CATEGORY_HAS_PRODUCTS);
+        }
         repository.deleteById(id);
     }
 }

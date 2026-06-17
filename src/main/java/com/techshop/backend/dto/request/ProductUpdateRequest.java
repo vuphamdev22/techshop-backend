@@ -28,6 +28,8 @@ public class ProductUpdateRequest {
 
     private String badge;
 
+    private Long brandId;
+
     private String sku;
 
     @Min(0)

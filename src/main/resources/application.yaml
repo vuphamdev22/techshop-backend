@@ -18,6 +18,19 @@ spring:
     time-zone: Asia/Ho_Chi_Minh
     date-format: yyyy-MM-dd HH:mm:ss
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME:volttech.store01@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:onbgcktlphfrssno}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
 server:
   port: 8080
 
@@ -49,3 +62,17 @@ vnpay:
   orderType: other
   locale: vn
   currCode: VND
+
+# ================= VIETQR CONFIG =================
+vietqr:
+  accountNumber: "0344998620"
+  accountName: "PHAM VAN VU"
+  bankCode: "MB"
+  bankName: "MB BANK"
+  template: compact
+  qrCodeSize: 300
+
+# ================= GEMINI AI CONFIG =================
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}

@@ -17,7 +17,13 @@ public interface ProductService {
 
     List<ProductResponse> getProductsByCategory(Long categoryId);
 
-    List<ProductResponse> searchProduct(String keyword);
+    List<ProductResponse> searchProduct(
+            String keyword,
+            Long categoryId,
+            Double minPrice,
+            Double maxPrice,
+            String sort
+    );
 
     ProductResponse updateProduct(Long id, ProductUpdateRequest product);
 

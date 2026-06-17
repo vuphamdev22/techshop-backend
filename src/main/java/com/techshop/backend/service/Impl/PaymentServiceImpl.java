@@ -3,6 +3,7 @@ package com.techshop.backend.service.Impl;
 import com.techshop.backend.config.VnPayConfig;
 import com.techshop.backend.dto.request.PaymentCreateRequest;
 import com.techshop.backend.dto.response.PaymentResponse;
+import com.techshop.backend.dto.response.VietQRResponse;
 import com.techshop.backend.entity.Order;
 import com.techshop.backend.entity.Payment;
 import com.techshop.backend.enums.OrderStatus;
@@ -14,6 +15,7 @@ import com.techshop.backend.mapper.PaymentMapper;
 import com.techshop.backend.repository.OrderRepository;
 import com.techshop.backend.repository.PaymentRepository;
 import com.techshop.backend.service.PaymentService;
+import com.techshop.backend.service.VietQRService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentMapper paymentMapper;
     private final VnPayConfig vnPayConfig;
+    private final VietQRService vietQRService;
 
     @Override
     @Transactional
@@ -143,6 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
     public String generateMockPaymentUrl(Payment payment) {
         if (payment.getMethod() == PaymentMethod.VNPAY) {
             return generateVnPayUrl(payment);
+        } else if (payment.getMethod() == PaymentMethod.VIETQR) {
+            // VietQR không cần URL, chỉ cần QR code
+            return "VIETQR_QR_CODE_GENERATED";
         }
         // Mock URL cho development
         // Trong production, tích hợp với VNPAY/MOMO

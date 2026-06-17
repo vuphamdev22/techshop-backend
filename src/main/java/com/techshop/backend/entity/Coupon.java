@@ -16,9 +16,28 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String code;
 
-    private Integer discountPercent;
+    @Column(nullable = false)
+    private String discountType; // "percentage" or "fixed"
 
-    private LocalDateTime expiryDate;
+    @Column(nullable = false)
+    private Double discountValue;
+
+    private Double minOrderValue;
+
+    private Double maxDiscount;
+
+    private Integer usageLimit;
+
+    @Column(nullable = false)
+    private Integer usedCount = 0;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }

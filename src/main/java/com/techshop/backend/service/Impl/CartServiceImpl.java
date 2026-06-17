@@ -103,7 +103,7 @@ public class CartServiceImpl implements CartService {
 
         // 🔥 check item có thuộc user không (rất quan trọng)
         if (!item.getCart().getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         item.setQuantity(quantity);

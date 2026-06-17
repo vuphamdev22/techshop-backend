@@ -66,8 +66,15 @@ public class AuthController {
                 List.of(user.getRole().name())
         );
 
+        com.techshop.backend.dto.response.UserDTO userDTO = new com.techshop.backend.dto.response.UserDTO(
+                user.getId(),
+                user.getFirstName() + " " + user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole().name()
+        );
 
-        return ResponseEntity.ok(new JwtResponse(newAccessToken, refreshToken));
+        return ResponseEntity.ok(new JwtResponse(newAccessToken, refreshToken, userDTO));
     }
 
     @PostMapping("/logout")

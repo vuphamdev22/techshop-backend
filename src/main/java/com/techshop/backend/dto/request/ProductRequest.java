@@ -21,6 +21,8 @@ public class ProductRequest {
 
     private String badge;
 
+    private Long brandId;
+
     private String sku;
 
     private Integer minStock;
@@ -86,6 +88,14 @@ public class ProductRequest {
 
     public void setBadge(String badge) {
         this.badge = badge;
+    }
+
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
     }
 
     public String getSku() {
